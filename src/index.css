@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .dark {
+    --surface-0: 10 11 15;
+    --surface-1: 17 19 24;
+    --surface-2: 24 27 34;
+    --surface-3: 31 35 48;
+    --surface-4: 37 42 56;
+    --border-subtle: 30 35 51;
+    --border: 42 49 72;
+    --border-strong: 61 74 107;
+    --accent: 79 126 248;
+    --accent-hover: 107 148 255;
+    --accent-muted: 30 58 138;
+    --success: 34 197 94;
+    --success-muted: 20 83 45;
+    --warning: 245 158 11;
+    --warning-muted: 120 53 15;
+    --danger: 239 68 68;
+    --danger-muted: 127 29 29;
+    --text-primary: 240 242 248;
+    --text-secondary: 156 166 186;
+    --text-muted: 120 130 148;
+    --text-inverse: 10 11 15;
+    --shimmer-1: 31 35 48;
+    --shimmer-2: 37 42 56;
+    --autofill-bg: 24 27 34;
+    --autofill-text: 240 242 248;
+  }
+
+  .light {
+    --surface-0: 245 246 250;
+    --surface-1: 255 255 255;
+    --surface-2: 238 240 246;
+    --surface-3: 228 231 240;
+    --surface-4: 217 221 232;
+    --border-subtle: 221 224 236;
+    --border: 200 205 224;
+    --border-strong: 154 162 188;
+    --accent: 59 110 245;
+    --accent-hover: 43 92 224;
+    --accent-muted: 220 230 255;
+    --success: 22 163 74;
+    --success-muted: 220 252 231;
+    --warning: 217 119 6;
+    --warning-muted: 254 243 199;
+    --danger: 220 38 38;
+    --danger-muted: 254 226 226;
+    --text-primary: 13 17 23;
+    --text-secondary: 74 85 104;
+    --text-muted: 90 105 120;
+    --text-inverse: 245 246 250;
+    --shimmer-1: 228 231 240;
+    --shimmer-2: 217 221 232;
+    --autofill-bg: 238 240 246;
+    --autofill-text: 13 17 23;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-surface-0 text-text-primary font-sans;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-text-primary;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-strong rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent/60;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgb(var(--autofill-bg)) inset !important;
+    -webkit-text-fill-color: rgb(var(--autofill-text)) !important;
+    caret-color: rgb(var(--autofill-text));
+  }
+}
+
+@layer components {
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--shimmer-1)) 25%,
+      rgb(var(--shimmer-2)) 50%,
+      rgb(var(--shimmer-1)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-hover)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .status-pending {
+    @apply bg-warning/10 text-warning border border-warning/20;
+  }
+
+  .status-disposed {
+    @apply bg-success/10 text-success border border-success/20;
+  }
+
+  .status-unknown {
+    @apply bg-border-subtle/60 text-text-muted border border-border;
+  }
+
+  .status-transferred {
+    @apply bg-accent/10 text-accent border border-accent/20;
+  }
+}
+
+@layer utilities {
+  .safe-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-pt {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
