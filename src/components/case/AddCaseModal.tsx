@@ -270,5 +270,3 @@ export const AddCaseModal: React.FC<AddCaseModalProps> = ({ open, onClose, onAdd
     </Modal>
   )
 }
-
-// TODO: Add duplicate tracking validations
