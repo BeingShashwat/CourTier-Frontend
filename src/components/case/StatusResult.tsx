@@ -160,5 +160,3 @@ export const StatusResult: React.FC<StatusResultProps> = ({
     </div>
   )
 }
-
-// TODO: implement CAPTCHA verification layout
