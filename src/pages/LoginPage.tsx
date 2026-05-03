@@ -163,4 +163,3 @@ export const LoginPage: React.FC = () => {
     </div>
   )
 }
-// TODO: standardize form error validations with toast notifications
