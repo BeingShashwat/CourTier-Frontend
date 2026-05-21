@@ -170,5 +170,3 @@ export const CasesPage: React.FC = () => {
     </>
   )
 }
-
-// TODO: implement archive and delete cases handlers

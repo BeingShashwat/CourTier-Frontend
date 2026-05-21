@@ -108,5 +108,3 @@ export const CaseDetailPage: React.FC = () => {
     </div>
   )
 }
-
-// TODO: support case removal action
