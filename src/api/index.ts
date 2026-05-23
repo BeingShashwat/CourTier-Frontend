@@ -215,4 +215,3 @@ export const notificationsApi = {
 }
 
 export default api
-// TODO: integrate automatic token refresh on 401 response interceptor
