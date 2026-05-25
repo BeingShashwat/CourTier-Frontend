@@ -172,5 +172,3 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     </div>
   )
 }
-
-// TODO: add manual scrap sync button
