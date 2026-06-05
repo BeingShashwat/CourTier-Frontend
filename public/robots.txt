@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /cases/
+Disallow: /check
+Disallow: /api/
+
+Sitemap: http://localhost:5173/sitemap.xml
