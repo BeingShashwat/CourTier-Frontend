@@ -211,11 +211,6 @@ export const authApi = {
 }
 
 export const casesApi = {
-  getCaptcha: (cnrNumber: string) =>
-    api.get<ApiResponse<import('@/types').CaptchaResponse>>('/cases/captcha', {
-      params: { cnrNumber },
-    }),
-
   addCase: (data: import('@/types').AddCaseRequest) =>
     api.post<ApiResponse<import('@/types').CaseResponse>>('/cases', data),
 

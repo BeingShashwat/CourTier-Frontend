@@ -67,15 +67,6 @@ export interface CaseResponse {
 
 export interface AddCaseRequest {
   cnrNumber: string
-  sessionId?: string
-  captchaSolution?: string
-}
-
-// ─── Captcha ─────────────────────────────────────────────────────────────────
-
-export interface CaptchaResponse {
-  sessionId: string
-  captchaImageBase64: string
 }
 
 // ─── API Wrapper ─────────────────────────────────────────────────────────────

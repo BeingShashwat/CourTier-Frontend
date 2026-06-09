@@ -342,9 +342,9 @@ export const DashboardPage: React.FC = () => {
               >
                 <div>
                   <h4 className="text-sm font-medium text-text-primary group-hover:text-accent transition-colors">
-                    Search Without Tracking
+                    Quick Case Lookup
                   </h4>
-                  <p className="text-[11px] text-text-secondary mt-0.5">Quick search status with captcha</p>
+                  <p className="text-[11px] text-text-secondary mt-0.5">Look up a case by CNR number</p>
                 </div>
                 <Search className="h-4 w-4 text-text-muted group-hover:text-accent transition-colors" />
               </button>

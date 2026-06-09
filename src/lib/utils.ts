@@ -56,16 +56,6 @@ export function daysUntil(dateStr: string | null | undefined): number | null {
   }
 }
 
-// ─── CNR helpers ──────────────────────────────────────────────────────────
-
-export function isHighCourtCNR(cnr: string): boolean {
-  return cnr.length >= 4 && cnr.substring(0, 4).toUpperCase().endsWith('HC')
-}
-
-export function needsCaptcha(cnr: string): boolean {
-  return !isHighCourtCNR(cnr)
-}
-
 // ─── String helpers ───────────────────────────────────────────────────────
 
 export function truncate(str: string | null | undefined, maxLength: number): string {
