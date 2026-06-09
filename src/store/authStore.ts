@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
-    set({ user: null, accessToken: null, isAuthenticated: false })
+    set({ user: null, accessToken: null, isAuthenticated: false, hydrated: true })
   },
 
   hydrate: () => {
@@ -61,5 +61,3 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ hydrated: true })
   },
 }))
-
-useAuthStore.getState().hydrate()

@@ -7,8 +7,28 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   retryCount?: number
 }
 
+function normalizeApiBaseUrl(url: string): string {
+  const trimmed = url.trim().replace(/\/+$/, '')
+  if (!trimmed) return '/api'
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`
+}
+
+function buildApiUrl(path: string): string {
+  const root = normalizeApiBaseUrl(import.meta.env.VITE_API_URL || '')
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  return `${root}${normalizedPath}`
+}
+
+const apiBaseUrl = normalizeApiBaseUrl(import.meta.env.VITE_API_URL || '')
+
+function applyAuthTokens(accessToken: string, refreshToken: string) {
+  localStorage.setItem('accessToken', accessToken)
+  localStorage.setItem('refreshToken', refreshToken)
+  api.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+}
+
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || '') + '/api',
+  baseURL: apiBaseUrl,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -20,11 +40,11 @@ const logoutAndRedirect = () => {
   localStorage.removeItem('accessToken')
   localStorage.removeItem('refreshToken')
   localStorage.removeItem('user')
-  
+
   // Only redirect if not already on the login/register/forgot-password/verify-email pages
   const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/']
   if (!publicPaths.includes(window.location.pathname)) {
-    window.location.href = '/login'
+    window.location.replace('/login')
   }
 }
 
@@ -43,9 +63,14 @@ api.interceptors.request.use(
 
 // Variables to handle refreshing queue
 let isRefreshing = false
-let failedQueue: any[] = []
+type QueueItem = {
+  resolve: (token: string | null) => void
+  reject: (error: unknown) => void
+}
 
-const processQueue = (error: any, token: string | null = null) => {
+let failedQueue: QueueItem[] = []
+
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error)
@@ -104,19 +129,19 @@ api.interceptors.response.use(
       }
 
       return new Promise((resolve, reject) => {
-        const refreshBaseUrl = import.meta.env.VITE_API_URL || ''
+        const refreshUrl = buildApiUrl('/auth/refresh')
+        const refreshTokenUrl = buildApiUrl('/auth/refresh-token')
+
         // Attempt to refresh the access token
         axios
-          .post(`${refreshBaseUrl}/api/auth/refresh`, { refreshToken })
+          .post(refreshUrl, { refreshToken })
           .then(({ data }) => {
             if (data.success && data.data?.accessToken) {
               const newAccessToken = data.data.accessToken
               const newRefreshToken = data.data.refreshToken || refreshToken
 
-              localStorage.setItem('accessToken', newAccessToken)
-              localStorage.setItem('refreshToken', newRefreshToken)
+              applyAuthTokens(newAccessToken, newRefreshToken)
 
-              api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`
               originalRequest.headers = originalRequest.headers || {}
               originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
 
@@ -130,16 +155,14 @@ api.interceptors.response.use(
           .catch((refreshError) => {
             // If refresh fails, try alternative /auth/refresh-token or logout
             axios
-              .post(`${refreshBaseUrl}/api/auth/refresh-token`, { refreshToken })
+              .post(refreshTokenUrl, { refreshToken })
               .then(({ data }) => {
                 if (data.success && data.data?.accessToken) {
                   const newAccessToken = data.data.accessToken
                   const newRefreshToken = data.data.refreshToken || refreshToken
 
-                  localStorage.setItem('accessToken', newAccessToken)
-                  localStorage.setItem('refreshToken', newRefreshToken)
+                  applyAuthTokens(newAccessToken, newRefreshToken)
 
-                  api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`
                   originalRequest.headers = originalRequest.headers || {}
                   originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
 
