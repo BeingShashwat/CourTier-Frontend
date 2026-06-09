@@ -113,7 +113,7 @@ export const ResetPasswordPage: React.FC = () => {
                   Password reset email flow has completed. You can now sign in with your new password.
                   <br />
                   <span className="text-xs mt-1 block opacity-80">
-                    Didn't receive the email? Please check your Spam/Junk folder.
+                    Didn't receive the email? Check spam/junk folder if the email is not visible.
                   </span>
                 </p>
               </div>
@@ -170,7 +170,7 @@ export const ResetPasswordPage: React.FC = () => {
 
                 <div className="flex gap-2.5 p-3 bg-accent/5 border border-accent/15 rounded-lg text-xs text-text-secondary leading-relaxed">
                   <Info className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
-                  <p>Didn't receive the email? Please check your Spam/Junk folder.</p>
+                  <p>Didn't receive the email? Check spam/junk folder if the email is not visible.</p>
                 </div>
 
                 <Button type="submit" className="w-full mt-2" size="lg" loading={loading}>

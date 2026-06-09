@@ -97,7 +97,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 <div>
                   <p className="font-medium text-text-primary">Email verification flow</p>
                   <p className="mt-1 text-xs">
-                    Didn't receive the email? Please check your Spam/Junk folder.
+                    Didn't receive the email? Check spam/junk folder if the email is not visible.
                   </p>
                 </div>
               </div>

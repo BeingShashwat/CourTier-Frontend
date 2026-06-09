@@ -197,7 +197,7 @@ export const RegisterPage: React.FC = () => {
                   <Info className="h-4 w-4 text-accent shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-text-primary">Didn't receive the email?</p>
-                    <p className="mt-0.5">Please check your Spam/Junk folder.</p>
+                    <p className="mt-0.5">Check spam/junk folder if the email is not visible.</p>
                   </div>
                 </div>
                 <button
