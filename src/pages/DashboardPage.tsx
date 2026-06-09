@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Scale,
@@ -57,38 +57,53 @@ export const DashboardPage: React.FC = () => {
   const [notifications, setNotifications] = useState<CourtNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [notificationsLoading, setNotificationsLoading] = useState(true)
+  const [casesError, setCasesError] = useState('')
+  const [notificationsError, setNotificationsError] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [refreshingCnr, setRefreshingCnr] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadDashboardData()
+  const loadDashboardData = useCallback(async () => {
+    setLoading(true)
+    setNotificationsLoading(true)
+    setCasesError('')
+    setNotificationsError('')
+
+    const [casesResult, notificationsResult] = await Promise.allSettled([
+      casesApi.getMyCases(),
+      notificationsApi.getMyNotifications(),
+    ])
+
+    if (casesResult.status === 'fulfilled') {
+      if (casesResult.value.data.success && casesResult.value.data.data) {
+        setCases(casesResult.value.data.data)
+      } else {
+        const message = casesResult.value.data.error ?? 'Could not load cases'
+        setCasesError(message)
+        toast.error('Could not load cases', message)
+      }
+    } else {
+      const message = extractError(casesResult.reason)
+      setCasesError(message)
+      toast.error('Could not load cases', message)
+    }
+
+    if (notificationsResult.status === 'fulfilled') {
+      if (notificationsResult.value.data.success && notificationsResult.value.data.data) {
+        setNotifications(notificationsResult.value.data.data)
+      } else {
+        setNotificationsError(notificationsResult.value.data.error ?? 'Could not load notifications')
+      }
+    } else {
+      setNotificationsError(extractError(notificationsResult.reason))
+    }
+
+    setLoading(false)
+    setNotificationsLoading(false)
   }, [])
 
-  const loadDashboardData = async () => {
-    setLoading(true)
-    try {
-      const casesRes = await casesApi.getMyCases()
-      if (casesRes.data.success && casesRes.data.data) {
-        setCases(casesRes.data.data)
-      }
-    } catch (e) {
-      toast.error('Could not load cases', extractError(e))
-    } finally {
-      setLoading(false)
-    }
-
-    setNotificationsLoading(true)
-    try {
-      const notifsRes = await notificationsApi.getMyNotifications()
-      if (notifsRes.data.success && notifsRes.data.data) {
-        setNotifications(notifsRes.data.data)
-      }
-    } catch (e) {
-      console.error('Could not load notifications', e)
-    } finally {
-      setNotificationsLoading(false)
-    }
-  }
+  useEffect(() => {
+    void loadDashboardData()
+  }, [loadDashboardData])
 
   const handleRefresh = async (cnr: string) => {
     setRefreshingCnr(cnr)
@@ -263,6 +278,17 @@ export const DashboardPage: React.FC = () => {
                   <CaseCardSkeleton key={i} />
                 ))}
               </div>
+            ) : casesError ? (
+              <EmptyState
+                icon={<AlertTriangle />}
+                title="Could not load cases"
+                description={casesError}
+                action={
+                  <Button variant="outline" onClick={loadDashboardData}>
+                    Retry
+                  </Button>
+                }
+              />
             ) : sortedCases.length === 0 ? (
               <EmptyState
                 icon={<Scale />}
@@ -354,6 +380,19 @@ export const DashboardPage: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : notificationsError ? (
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-danger/20 bg-danger/5">
+                  <AlertTriangle className="h-4 w-4 text-danger shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-text-primary">Updates unavailable</p>
+                    <p className="text-xs text-text-secondary mt-0.5 break-words">{notificationsError}</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={loadDashboardData}>
+                  Retry
+                </Button>
               </div>
             ) : notifications.length === 0 ? (
               <div className="py-8 text-center">

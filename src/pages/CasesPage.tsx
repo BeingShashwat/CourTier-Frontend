@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Plus, Search, Scale, Filter } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Plus, Search, Scale, Filter, AlertTriangle } from 'lucide-react'
 import { casesApi } from '@/api'
 import { CaseCard } from '@/components/case/CaseCard'
 import { AddCaseModal } from '@/components/case/AddCaseModal'
@@ -28,23 +28,36 @@ export const CasesPage: React.FC = () => {
 
   const [cases, setCases] = useState<CaseResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<FilterStatus>('ALL')
   const [refreshingCnr, setRefreshingCnr] = useState<string | null>(null)
 
-  useEffect(() => { loadCases() }, [])
-
-  const loadCases = async () => {
+  const loadCases = useCallback(async () => {
+    setLoading(true)
+    setError('')
     try {
       const res = await casesApi.getMyCases()
-      if (res.data.success && res.data.data) setCases(res.data.data)
+      if (res.data.success && res.data.data) {
+        setCases(res.data.data)
+      } else {
+        const message = res.data.error ?? 'Could not load cases'
+        setError(message)
+        toast.error('Could not load cases', message)
+      }
     } catch (e) {
-      toast.error('Could not load cases', extractError(e))
+      const message = extractError(e)
+      setError(message)
+      toast.error('Could not load cases', message)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    void loadCases()
+  }, [loadCases])
 
   const handleRefresh = async (cnr: string) => {
     setRefreshingCnr(cnr)
@@ -133,6 +146,17 @@ export const CasesPage: React.FC = () => {
           <div className="space-y-3">
             {[0, 1, 2, 3].map((i) => <CaseCardSkeleton key={i} />)}
           </div>
+        ) : error ? (
+          <EmptyState
+            icon={<AlertTriangle />}
+            title="Could not load cases"
+            description={error}
+            action={
+              <Button variant="outline" onClick={loadCases}>
+                Retry
+              </Button>
+            }
+          />
         ) : filtered.length === 0 && cases.length === 0 ? (
           <EmptyState
             icon={<Scale />}

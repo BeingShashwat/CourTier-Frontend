@@ -26,6 +26,8 @@ export const CaseDetailPage: React.FC = () => {
   const [error, setError] = useState('')
 
   const loadCase = useCallback(async () => {
+    setLoading(true)
+    setError('')
     try {
       const res = await casesApi.getCase(cnrNumber!)
       if (res.data.success && res.data.data) {
@@ -85,12 +87,17 @@ export const CaseDetailPage: React.FC = () => {
     return (
       <EmptyState
         icon={<Scale />}
-        title="Case not found"
+        title="Could not load case"
         description={error || 'This case could not be loaded.'}
         action={
-          <Button variant="outline" onClick={() => navigate('/cases')}>
-            Back to cases
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" onClick={() => void loadCase()}>
+              Retry
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/cases')}>
+              Back to cases
+            </Button>
+          </div>
         }
       />
     )
