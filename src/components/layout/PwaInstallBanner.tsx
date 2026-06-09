@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Download, X, Share2, PlusSquare, MoreVertical } from 'lucide-react'
+import { Download, X, Share2, MoreVertical } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 export const PwaInstallBanner: React.FC = () => {
@@ -8,18 +8,15 @@ export const PwaInstallBanner: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
-    // 1. Check if already installed / running in standalone mode
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (navigator as any).standalone === true
 
     if (isStandalone) return
 
-    // 2. Check if user has dismissed it
     const isDismissed = localStorage.getItem('courtier-pwa-dismissed') === 'true'
     if (isDismissed) return
 
-    // 3. Platform check
     const ua = navigator.userAgent.toLowerCase()
     const isIos = /iphone|ipad|ipod/.test(ua)
     const isAndroid = /android/.test(ua)
@@ -33,7 +30,6 @@ export const PwaInstallBanner: React.FC = () => {
       setPlatform('android')
     }
 
-    // 4. Capture native install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e)
@@ -41,19 +37,7 @@ export const PwaInstallBanner: React.FC = () => {
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-    // For iOS, beforeinstallprompt is never supported but PWA is.
-    // For some Android browsers, beforeinstallprompt might not fire instantly,
-    // so we can display the custom guidance after a small delay.
-    if (isIos || isAndroid) {
-      const timer = setTimeout(() => {
-        setShow(true)
-      }, 2000)
-      return () => {
-        clearTimeout(timer)
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      }
-    }
+    setShow(true)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -85,24 +69,28 @@ export const PwaInstallBanner: React.FC = () => {
           <Download className="h-5 w-5" />
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-text-primary">Install CourTier App</h4>
+          <h4 className="text-sm font-semibold text-text-primary">Install CourTier</h4>
           <p className="text-xs text-text-secondary mt-0.5 max-w-md">
-            Add CourTier to your home screen for instant access, offline support, and a fast native-like experience.
+            Add CourTier to your home screen for faster access and offline-ready use.
           </p>
 
-          {/* Contextual Instructions */}
+          <div className="mt-2 space-y-1 text-xs text-text-secondary">
+            <p className="font-medium text-text-primary">Android browsers</p>
+            <p>Chrome Android: Menu → Add to Home Screen</p>
+            <p>Brave Android: Menu → Add to Home Screen</p>
+          </div>
+
           {platform === 'ios' && (
             <div className="flex items-center gap-1.5 mt-2 text-xs text-accent">
               <Share2 className="h-3.5 w-3.5" />
-              <span>Tap the share button, then select <strong>'Add to Home Screen'</strong></span>
-              <PlusSquare className="h-3.5 w-3.5" />
+              <span>Tap Share, then choose Add to Home Screen.</span>
             </div>
           )}
 
           {platform === 'android' && !deferredPrompt && (
             <div className="flex items-center gap-1.5 mt-2 text-xs text-accent">
               <MoreVertical className="h-3.5 w-3.5" />
-              <span>Tap the browser menu (3 dots) and select <strong>'Add to Home Screen'</strong></span>
+              <span>Use the browser menu to add CourTier to your device.</span>
             </div>
           )}
         </div>
