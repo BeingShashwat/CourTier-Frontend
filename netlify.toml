@@ -45,11 +45,11 @@
 
 # OPTIONAL: Proxy API traffic to EC2 Nginx gateway if CORS is not used.
 # Uncomment and update the 'to' path with your EC2 API server endpoint.
-# [[redirects]]
-#   from = "/api/*"
-#   to = "https://api.courtier.in/api/:splat"
-#   status = 200
-#   force = true
+[[redirects]]
+  from = "/api/*"
+  to = "http://13.233.118.69/api/:splat"
+  status = 200
+  force = true
 
 # FALLBACK RULE: Redirect all client-side paths to index.html for SPA React Router
 [[redirects]]
