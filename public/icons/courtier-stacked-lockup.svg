@@ -1,0 +1,59 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="48" fill="#f5f6fa"/>
+
+  <g transform="translate(160,115)">
+    <rect x="40" y="15" width="120" height="12" rx="6" fill="#E8A020"/>
+
+    <rect x="50" y="52" width="100" height="12" rx="6" fill="#1A2744"/>
+
+    <rect x="96" y="64" width="8" height="75" rx="4" fill="#1A2744"/>
+
+    <path d="M46 130 C72 162 128 162 154 130"
+          stroke="#1A2744"
+          stroke-width="8"
+          fill="none"
+          stroke-linecap="round"/>
+
+    <path d="M24 138 C30 150 36 156 46 164"
+          stroke="#1A2744"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"/>
+
+    <path d="M176 138 C170 150 164 156 154 164"
+          stroke="#1A2744"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"/>
+  </g>
+
+  <text x="190"
+        y="355"
+        text-anchor="middle"
+        font-family="Inter,Arial,sans-serif"
+        font-size="72"
+        font-weight="400"
+        fill="#1A2744">
+    Cour
+  </text>
+
+  <text x="342"
+        y="354"
+        text-anchor="middle"
+        font-family="Inter,Arial,sans-serif"
+        font-size="76"
+        font-weight="700"
+        fill="#E8A020">
+    Tier
+  </text>
+
+  <text x="256"
+        y="455"
+        text-anchor="middle"
+        font-family="Inter,Arial,sans-serif"
+        font-size="18"
+        fill="#64748B"
+        letter-spacing="0.08em">
+    Track Every Hearing. Miss Nothing.
+  </text>
+</svg>
