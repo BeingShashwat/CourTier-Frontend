@@ -47,7 +47,7 @@
 # Uncomment and update the 'to' path with your EC2 API server endpoint.
 [[redirects]]
   from = "/api/*"
-  to = "http://34.14.217.158/api/:splat"
+  to = "https://api.courtier.page/api/:splat"
   status = 200
   force = true
 

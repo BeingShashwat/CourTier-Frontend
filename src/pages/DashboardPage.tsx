@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Scale,
@@ -22,8 +22,10 @@ import { CaseCardSkeleton } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { toast } from '@/store/toastStore'
 import { daysUntil, extractError, timeAgo } from '@/lib/utils'
-import type { CaseResponse, CourtNotification } from '@/types'
 import { useSeo } from '@/hooks/useSeo'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCases } from '@/hooks/useCases'
+import { useNotifications } from '@/hooks/useNotifications'
 
 const StatCard: React.FC<{
   icon: React.ReactNode
@@ -53,71 +55,48 @@ export const DashboardPage: React.FC = () => {
     description: 'Monitor your tracked court cases, view upcoming hearing dates, recent activity updates, and manage notifications in one unified dashboard.',
   })
 
-  const [cases, setCases] = useState<CaseResponse[]>([])
-  const [notifications, setNotifications] = useState<CourtNotification[]>([])
-  const [loading, setLoading] = useState(true)
-  const [notificationsLoading, setNotificationsLoading] = useState(true)
-  const [casesError, setCasesError] = useState('')
-  const [notificationsError, setNotificationsError] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [refreshingCnr, setRefreshingCnr] = useState<string | null>(null)
 
-  const loadDashboardData = useCallback(async () => {
-    setLoading(true)
-    setNotificationsLoading(true)
-    setCasesError('')
-    setNotificationsError('')
+  const queryClient = useQueryClient()
 
-    const [casesResult, notificationsResult] = await Promise.allSettled([
-      casesApi.getMyCases(),
-      notificationsApi.getMyNotifications(),
-    ])
+  const {
+    data: cases = [],
+    isLoading: loading,
+    error: casesErrorObj,
+  } = useCases()
 
-    if (casesResult.status === 'fulfilled') {
-      if (casesResult.value.data.success && casesResult.value.data.data) {
-        setCases(casesResult.value.data.data)
-      } else {
-        const message = casesResult.value.data.error ?? 'Could not load cases'
-        setCasesError(message)
-        toast.error('Could not load cases', message)
-      }
-    } else {
-      const message = extractError(casesResult.reason)
-      setCasesError(message)
-      toast.error('Could not load cases', message)
-    }
+  const {
+    data: notifications = [],
+    isLoading: notificationsLoading,
+    error: notificationsErrorObj,
+  } = useNotifications()
 
-    if (notificationsResult.status === 'fulfilled') {
-      if (notificationsResult.value.data.success && notificationsResult.value.data.data) {
-        setNotifications(notificationsResult.value.data.data)
-      } else {
-        setNotificationsError(notificationsResult.value.data.error ?? 'Could not load notifications')
-      }
-    } else {
-      setNotificationsError(extractError(notificationsResult.reason))
-    }
+  const casesError =
+      casesErrorObj instanceof Error
+          ? casesErrorObj.message
+          : ''
 
-    setLoading(false)
-    setNotificationsLoading(false)
-  }, [])
-
-  useEffect(() => {
-    void loadDashboardData()
-  }, [loadDashboardData])
+  const notificationsError =
+      notificationsErrorObj instanceof Error
+          ? notificationsErrorObj.message
+          : ''
 
   const handleRefresh = async (cnr: string) => {
     setRefreshingCnr(cnr)
+
     try {
-      const res = await casesApi.pollCase(cnr)
-      if (res.data.success && res.data.data) {
-        setCases((prev) => prev.map((c) => (c.cnrNumber === cnr ? res.data.data! : c)))
-        toast.success('Case refreshed')
-        // Refresh notifications to show latest sync info
-        const notifsRes = await notificationsApi.getMyNotifications()
-        if (notifsRes.data.success && notifsRes.data.data) {
-          setNotifications(notifsRes.data.data)
-        }
-      }
+      await casesApi.pollCase(cnr)
+
+      await queryClient.invalidateQueries({
+        queryKey: ['cases'],
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: ['notifications'],
+      })
+
+      toast.success('Case refreshed')
     } catch (e) {
       toast.error('Refresh failed', extractError(e))
     } finally {
@@ -128,7 +107,11 @@ export const DashboardPage: React.FC = () => {
   const handleRemove = async (cnr: string) => {
     try {
       await casesApi.removeCase(cnr)
-      setCases((prev) => prev.filter((c) => c.cnrNumber !== cnr))
+
+      await queryClient.invalidateQueries({
+        queryKey: ['cases'],
+      })
+
       toast.success('Case removed')
     } catch (e) {
       toast.error('Failed to remove case', extractError(e))
@@ -159,6 +142,17 @@ export const DashboardPage: React.FC = () => {
   })
 
   const firstName = user?.fullName?.split(' ')[0] ?? 'there'
+
+
+  const loadDashboardData = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ['cases'],
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: ['notifications'],
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -448,7 +442,11 @@ export const DashboardPage: React.FC = () => {
       <AddCaseModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        onAdded={(c) => setCases((prev) => [c, ...prev])}
+        onAdded={() =>
+            queryClient.invalidateQueries({
+              queryKey: ['cases'],
+            })
+        }
       />
     </div>
   )

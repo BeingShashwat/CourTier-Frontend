@@ -13,7 +13,7 @@ function applyTheme(theme: Theme) {
   }
 }
 
-const stored = (localStorage.getItem('theme') as Theme | null) ?? 'dark'
+const stored = (localStorage.getItem('theme') as Theme | null) ?? 'light'
 applyTheme(stored)
 
 interface ThemeState {
